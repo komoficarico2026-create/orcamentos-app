@@ -15,6 +15,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -47,7 +48,10 @@ export default function SignupPage() {
       return;
     }
 
-
+    if (data.user && !data.session) {
+      setSuccess(true);
+      return;
+    }
 
     router.push("/dashboard");
   };
@@ -150,7 +154,23 @@ export default function SignupPage() {
                 </motion.div>
               )}
 
-              <form onSubmit={handleSignup} className="space-y-5">
+              {success && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="mb-8 p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex flex-col items-center justify-center text-center gap-3"
+                >
+                  <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500 mb-2">
+                    <Mail size={24} />
+                  </div>
+                  <h3 className="text-emerald-500 font-bold text-lg">Quase lá!</h3>
+                  <p className="text-emerald-500/80 text-xs font-medium leading-relaxed">
+                    Você precisa confirmar seu e-mail para ativar a conta. Enviamos um link de acesso para <strong>{email}</strong>.
+                  </p>
+                </motion.div>
+              )}
+
+              <form onSubmit={handleSignup} className={`space-y-5 ${success ? 'opacity-50 pointer-events-none' : ''}`}>
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-1">
                     Nome Completo
