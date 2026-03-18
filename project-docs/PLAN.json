@@ -1,0 +1,84 @@
+{
+  "planVersion": 18,
+  "project": {
+    "name": "orcamentos-app-micro-saas",
+    "slug": "orcamentos-app-micro-saas",
+    "description": "SaaS de gestão de clientes, orçamentos e financeiro para prestadores de serviço multi-nicho",
+    "currentPhase": "fase-4-documentos-e-entrega",
+    "targetVersion": "1.0.0"
+  },
+  "currentStatusSummary": {
+    "overallProgressEstimate": "82%"
+  },
+  "modules": {
+    "authentication": {
+      "status": "complete"
+    },
+    "dashboard": {
+      "status": "complete"
+    },
+    "clientes": {
+      "status": "complete"
+    },
+    "orcamentos": {
+      "status": "complete"
+    },
+    "financeiro": {
+      "status": "complete"
+    },
+    "pdf_orcamento": {
+      "status": "in-progress",
+      "subStatus": {
+        "layout_profissional": "in-progress",
+        "download": "in-progress",
+        "dados_emissor": "in-progress",
+        "dados_cliente": "in-progress"
+      }
+    },
+    "route-protection": {
+      "status": "planned"
+    },
+    "deploy": {
+      "status": "planned"
+    }
+  },
+  "routes": {
+    "public": [
+      "/",
+      "/login",
+      "/signup"
+    ],
+    "private": [
+      "/dashboard",
+      "/dashboard/clientes",
+      "/dashboard/orcamentos",
+      "/dashboard/orcamentos/novo",
+      "/dashboard/orcamentos/[id]/pdf",
+      "/dashboard/financeiro"
+    ]
+  },
+  "database": {
+    "tables": [
+      "profiles",
+      "clientes",
+      "orcamentos",
+      "itens_orcamento",
+      "financeiro"
+    ],
+    "profileFields": [
+      "name",
+      "phone",
+      "company_name",
+      "company_phone",
+      "company_email",
+      "company_document",
+      "company_city",
+      "company_state"
+    ]
+  },
+  "nextRecommendedAction": {
+    "module": "pdf_orcamento",
+    "reason": "fecha a entrega comercial do orcamento e aumenta valor percebido do produto",
+    "priority": "p1"
+  }
+}

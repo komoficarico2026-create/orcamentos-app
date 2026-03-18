@@ -1,0 +1,61 @@
+{
+  "tables": {
+    "profiles": {
+      "description": "Informações do usuário",
+      "columns": [
+        "id",
+        "user_id",
+        "name",
+        "phone",
+        "created_at"
+      ]
+    },
+    "clientes": {
+      "description": "Clientes do prestador",
+      "columns": [
+        "id",
+        "user_id",
+        "nome",
+        "telefone",
+        "email",
+        "endereco",
+        "created_at"
+      ]
+    },
+    "orcamentos": {
+      "description": "Orçamentos criados",
+      "columns": [
+        "id",
+        "user_id",
+        "cliente_id",
+        "descricao",
+        "valor_total",
+        "status",
+        "created_at"
+      ]
+    },
+    "itens_orcamento": {
+      "description": "Itens de cada orçamento",
+      "columns": [
+        "id",
+        "orcamento_id",
+        "descricao",
+        "quantidade",
+        "valor_unitario",
+        "created_at"
+      ]
+    },
+    "financeiro": {
+      "description": "Controle financeiro do usuário",
+      "columns": [
+        "id",
+        "user_id",
+        "tipo",
+        "valor",
+        "descricao",
+        "data",
+        "created_at"
+      ]
+    }
+  }
+}

@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 210 40% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --border: 214 32% 91%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+}
+
+.dark {
+  /* Slate 950 Background (#020617) */
+  --background: 229 84% 5%;
+  /* White Foreground */
+  --foreground: 210 40% 98%;
+  /* Glassmorphism Card (White/2%) */
+  --card: 229 84% 5%; 
+  --card-foreground: 210 40% 98%;
+  /* White/10 Border */
+  --border: 229 84% 15%;
+  /* Violet 600 Primary (#8b5cf6) */
+  --primary: 258 90% 66%;
+  --primary-foreground: 0 0% 100%;
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid rgb(139 92 246);
+  outline-offset: 2px;
+}
