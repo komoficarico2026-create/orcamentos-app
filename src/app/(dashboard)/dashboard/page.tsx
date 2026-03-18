@@ -17,6 +17,15 @@ import {
   ArrowUpRight
 } from "lucide-react";
 import { motion } from "framer-motion";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from "recharts";
 
 type OrcamentoResumo = {
   id: string;
@@ -53,6 +62,7 @@ export default function DashboardPage() {
     recebidos: 0,
     emAberto: 0,
   });
+  const [chartData, setChartData] = useState<any[]>([]);
   const [recentOrcamentos, setRecentOrcamentos] = useState<OrcamentoResumo[]>([]);
   const [userName, setUserName] = useState("Profissional");
 
@@ -130,6 +140,41 @@ export default function DashboardPage() {
         recebidos,
         emAberto,
       });
+
+      // Calcular dados do gráfico (últimos 6 meses)
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+      sixMonthsAgo.setDate(1);
+      
+      const { data: chartFinData } = await supabase
+        .from("financeiro")
+        .select("valor, data")
+        .eq("tipo", "entrada")
+        .gte("data", sixMonthsAgo.toISOString().split("T")[0]);
+
+      if (chartFinData) {
+        const monthlyData = new Map();
+        const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+        
+        // Initialize last 6 months with 0
+        for (let i = 5; i >= 0; i--) {
+          const d = new Date();
+          d.setMonth(d.getMonth() - i);
+          const key = `${monthNames[d.getMonth()]} ${d.getFullYear().toString().slice(-2)}`;
+          monthlyData.set(key, 0);
+        }
+
+        chartFinData.forEach((item) => {
+          const d = new Date(item.data);
+          const key = `${monthNames[d.getMonth()]} ${d.getFullYear().toString().slice(-2)}`;
+          if (monthlyData.has(key)) {
+            monthlyData.set(key, monthlyData.get(key) + Number(item.valor));
+          }
+        });
+
+        const formattedChartData = Array.from(monthlyData, ([name, total]) => ({ name, total }));
+        setChartData(formattedChartData);
+      }
 
       // 3. Últimos Orçamentos
       const { data: orcamentos } = await supabase
@@ -316,6 +361,63 @@ export default function DashboardPage() {
                   <ArrowUpRight size={20} className="opacity-60" />
                 </div>
               </motion.div>
+            </motion.div>
+
+            {/* Gráfico de Faturamento */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="bg-card/40 rounded-[2.5rem] p-8 border border-border/10 shadow-xl shadow-primary/5 backdrop-blur-xl group hover:border-primary/30 transition-all duration-500"
+            >
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                    <TrendingUp className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-foreground tracking-tight text-xl">Receita Recorrente</h3>
+                    <p className="text-xs text-foreground/50 font-bold uppercase tracking-widest">Últimos 6 meses</p>
+                  </div>
+                </div>
+                <div className="text-2xl font-black text-primary">
+                  R$ {chartData.reduce((acc, curr) => acc + curr.total, 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                  <p className="text-[10px] text-foreground/40 font-bold uppercase tracking-widest text-right mt-1">Acumulado</p>
+                </div>
+              </div>
+              <div className="h-[300px] w-full mt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--foreground)/0.1)" />
+                    <XAxis 
+                      dataKey="name" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fill: 'hsl(var(--foreground)/0.5)', fontSize: 12, fontWeight: 700 }} 
+                      dy={10}
+                    />
+                    <YAxis 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fill: 'hsl(var(--foreground)/0.5)', fontSize: 12, fontWeight: 700 }}
+                      tickFormatter={(value) => `R$${value >= 1000 ? (value / 1000).toFixed(1) + 'k' : value}`}
+                    />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '16px', border: '1px solid hsl(var(--border)/0.2)', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.2)', padding: '12px 20px' }}
+                      itemStyle={{ color: 'hsl(var(--primary))', fontWeight: 900, fontSize: '18px' }}
+                      labelStyle={{ color: 'hsl(var(--foreground)/0.6)', fontWeight: 700, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}
+                      formatter={(value: number) => [`R$ ${value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, 'Faturamento']}
+                    />
+                    <Area type="monotone" dataKey="total" stroke="hsl(var(--primary))" strokeWidth={4} fillOpacity={1} fill="url(#colorTotal)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
             </motion.div>
 
             {/* Acesso Rápido e Lista Combinada */}
