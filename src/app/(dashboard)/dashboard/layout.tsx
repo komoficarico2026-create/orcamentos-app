@@ -8,7 +8,7 @@ export default function DashboardLayout({
 }) {
   return (
     // <AuthGuard> - Temporarily disabled for UI testing
-      <div className="flex h-screen bg-background overflow-hidden">
+      <div className="flex flex-col md:flex-row h-screen bg-background overflow-hidden relative">
         <DashboardNav />
         <div className="flex-1 overflow-y-auto">
           {children}
